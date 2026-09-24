@@ -25,9 +25,11 @@ metadata:
     app: platform-hello
     app.kubernetes.io/name: platform-hello
 spec:
-  region: eu-west-1
-  publicRead: false      # deny-by-default per CLAUDE.md §4
-  versioning: true       # object versioning enabled — safe default
+  # XRD schema wraps user-facing fields under spec.parameters (ADR-0027).
+  parameters:
+    region: eu-west-1
+    publicRead: false      # deny-by-default per CLAUDE.md §4
+    versioning: true       # object versioning enabled — safe default
   # Where to write the connection details Deployment consumes via envFrom.
   writeConnectionSecretToRef:
     name: platform-hello-bucket-conn
