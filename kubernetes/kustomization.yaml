@@ -26,6 +26,5 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - externalsecret.yaml
-  - objectbucket.yaml
   - certificate.yaml
   - ingress.yaml
