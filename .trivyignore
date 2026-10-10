@@ -1,0 +1,33 @@
+# .trivyignore — CVEs the pipeline tolerates because no upstream fix
+# is available yet. Each entry carries a reason and a review date so
+# this file does not become a dumping ground for silenced findings.
+#
+# Policy (per ADR-0032):
+#   - Only CVEs with no patched version upstream may be added here.
+#   - Every entry MUST have a comment with the reason + a review date.
+#   - On every CI run, Trivy still prints these to the log — the ignore
+#     only suppresses the exit-code block, not the visibility.
+#   - Review this file monthly and remove entries whose upstream fixes
+#     have landed. If an entry is older than 90 days with no upstream
+#     progress, open a GitHub issue to track the gap.
+#
+# Last reviewed: 2026-10-10
+
+# ─── Fastify ────────────────────────────────────────────────────────
+# No upstream patch as of 2026-10-10. The fastify maintainers have
+# acknowledged these in their security advisories but no release has
+# shipped the fix. Monitor:
+#   https://github.com/fastify/fastify/security/advisories
+# Re-review: 2026-11-10
+CVE-2026-84428
+CVE-2026-84469
+CVE-2026-84504
+
+# ─── OpenSSL in distroless base ─────────────────────────────────────
+# These CVEs await the next Debian 12 security update cycle. Fix will
+# arrive automatically when gcr.io/distroless/nodejs22-debian12:nonroot
+# republishes against debian 12.x+1. The CI build pins to :nonroot
+# (floating tag) so rebuilds pick it up on next cache miss.
+# Re-review: 2026-11-10
+CVE-2026-28389
+CVE-2026-28390
