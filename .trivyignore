@@ -24,10 +24,18 @@ CVE-2026-84469
 CVE-2026-84504
 
 # ─── OpenSSL in distroless base ─────────────────────────────────────
-# These CVEs await the next Debian 12 security update cycle. Fix will
-# arrive automatically when gcr.io/distroless/nodejs22-debian12:nonroot
-# republishes against debian 12.x+1. The CI build pins to :nonroot
-# (floating tag) so rebuilds pick it up on next cache miss.
+# These CVEs have no upstream fix as of 2026-10-10. The Dockerfile
+# base is pinned to the current latest distroless digest, so any
+# openssl patch released upstream will arrive here on the next base
+# digest rotation (see Dockerfile for the rotation query).
+#
+# Note: the CVE IDs in this file must track Debian's security DB,
+# which periodically reorganises CVE assignments. First-ever CI run
+# surfaced CVE-2026-28389/28390 for the same openssl package; those
+# IDs were reorganised to -28387/-28388 within hours. Lesson learned:
+# .trivyignore entries can go stale not just because a fix lands but
+# because the vuln DB restructures. Re-verify IDs on every monthly
+# review.
 # Re-review: 2026-11-10
-CVE-2026-28389
-CVE-2026-28390
+CVE-2026-28387
+CVE-2026-28388

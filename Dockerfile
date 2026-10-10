@@ -24,7 +24,17 @@ RUN npx tsc
 
 # ---- Stage 2: runtime ----
 # distroless nodejs22:nonroot — no shell, runs as UID 65532
-FROM gcr.io/distroless/nodejs22-debian12:nonroot
+# Pinned to digest for two reasons:
+#   1. Reproducibility — the same code always builds the same image
+#   2. Defeat GitHub Actions buildx cache — pulling by digest guarantees
+#      a fresh base image, which matters for security patches (openssl
+#      updates in the base land here on next cache miss)
+# Rotate this digest on every monthly security review by querying:
+#   curl -sI https://gcr.io/v2/distroless/nodejs22-debian12/manifests/nonroot \
+#     -H "Accept: application/vnd.oci.image.index.v1+json" \
+#     | grep -i docker-content-digest
+# Last rotated: 2026-10-10
+FROM gcr.io/distroless/nodejs22-debian12:nonroot@sha256:13593b7570658e8477de39e2f4a1dd25db2f836d68a0ba771251572d23bb4f8e
 
 WORKDIR /app
 
