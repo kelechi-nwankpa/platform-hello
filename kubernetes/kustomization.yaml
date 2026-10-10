@@ -30,4 +30,4 @@ resources:
 images:
 - name: ghcr.io/kelechi-nwankpa/platform-hello
   newName: ghcr.io/kelechi-nwankpa/platform-hello
-  newTag: sha-$(echo "fa9ffbd620fbe09017f6e77d7e4efcc38eff9842" | cut -c1-7)
+  newTag: sha-acd5731
