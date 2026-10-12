@@ -1,0 +1,59 @@
+---
+# objectbucket.yaml — platform-hello
+#
+# Crossplane XRC (Composite Resource Claim) that materialises an S3-
+# compatible bucket via the platform's Phase 4 ObjectBucket XRD
+# (see ADR-0027). Previously removed from Git in Phase 6 (bug 5)
+# because Phase 4 Wave 1 shipped the XRD without a ProviderConfig —
+# the XRC applied but couldn't reconcile.
+#
+# Phase 4 Wave 2 fixed that. On kind, the XRD's defaultCompositionRef
+# now points at the MinIO-variant Composition (xobjectbuckets-minio),
+# which uses vshn/provider-minio to create a real bucket in MinIO.
+# On EKS (Phase 9+), the default flips to xobjectbuckets-s3, which
+# uses upbound provider-aws-s3 to create a real S3 bucket. Same XRC,
+# different backend — the XRD abstraction holds across environments.
+#
+# ─── IMPORTANT: Wave 2 scope was MINIMAL (Path M) ──────────────────
+# This XRC creates a Crossplane-managed bucket named
+# `platform-hello-<6char-suffix>`. But platform-hello's Deployment
+# currently reads/writes against the ORIGINAL manually-created bucket
+# named `platform-hello` via the manually-maintained Secret
+# `platform-hello-bucket-conn` (also in this namespace, NOT in Git).
+#
+# So after Wave 2:
+#   - This XRC proves the GitOps path works end-to-end on kind. ✓
+#   - The deployment still uses the manual bucket + manual Secret. ✗
+#
+# The CONVERGENCE (making the deployment actually read from this
+# Crossplane-managed bucket, with per-service IAM via vshn User +
+# Policy MRs rather than shared MinIO root creds) is explicitly
+# deferred to a Phase 4 Wave 3. See phase-4 close-out log for the
+# roadmap.
+#
+# writeConnectionSecretToRef is left in place for forward-compat:
+# when Wave 3 adds User+Policy MRs to the Composition, that Secret
+# will populate with real per-service creds, and the deployment can
+# switch over.
+# ────────────────────────────────────────────────────────────────────
+
+apiVersion: platform.idp.io/v1alpha1
+kind: ObjectBucket
+metadata:
+  name: platform-hello
+  labels:
+    app: platform-hello
+    app.kubernetes.io/name: platform-hello
+spec:
+  parameters:
+    region: us-east-1       # MinIO ignores this; must be a valid XRD enum value
+    publicRead: false       # SILENTLY IGNORED on kind (vshn provider limitation,
+                            # Gap-A decision — Phase 4 Wave 2 strategic intro)
+    versioning: true        # SILENTLY IGNORED on kind (same reason)
+                            # Both take effect on EKS where the s3 variant runs
+  writeConnectionSecretToRef:
+    name: platform-hello-bucket-conn-xrd
+    # NOTE: deliberately NOT `platform-hello-bucket-conn` — that name is
+    # claimed by the Wave 2-era manual Secret (not in Git). Rename back
+    # to `platform-hello-bucket-conn` when Wave 3 lands and deletes
+    # the manual Secret.

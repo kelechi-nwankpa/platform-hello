@@ -27,6 +27,9 @@ resources:
 - externalsecret.yaml
 - certificate.yaml
 - ingress.yaml
+- objectbucket.yaml   # restored Phase 4 Wave 2 (Path M) — Crossplane-managed
+                      # bucket via vshn/provider-minio on kind; see the file
+                      # header for the Wave 3 convergence TODO
 images:
 - name: ghcr.io/kelechi-nwankpa/platform-hello
   newName: ghcr.io/kelechi-nwankpa/platform-hello
