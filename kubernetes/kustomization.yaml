@@ -24,8 +24,6 @@ resources:
 - deployment.yaml
 - service.yaml
 - servicemonitor.yaml
-- certificate.yaml
-- ingress.yaml
 - objectbucket.yaml
                       # bucket via vshn/provider-minio on kind; see the file
                       # header for the Wave 3 convergence TODO
