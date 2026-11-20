@@ -47,6 +47,15 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
     groups:
+      # OpenTelemetry JS ships as a lockstep set whose version numbers
+      # cross semver boundaries together (sdk-node 0.223 → 0.301 pairs
+      # with resources/core 2.x → 3.x and a narrow api peer range). The
+      # minor-and-patch group split that set and npm failed ERESOLVE.
+      # This group comes first (first match wins) and takes ALL update
+      # types, so the whole set moves in one PR.
+      opentelemetry:
+        patterns:
+          - "@opentelemetry/*"
       minor-and-patch:
         update-types:
           - minor
