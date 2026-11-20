@@ -16,22 +16,22 @@
     "docker:run": "docker run --rm -p 3000:3000 --env-file .env platform-hello:local"
   },
   "dependencies": {
-    "fastify": "5.12.5",
+    "@aws-sdk/client-s3": "3.1149.0",
     "@fastify/sensible": "6.0.7",
-    "@opentelemetry/api": "1.9.1",
-    "@opentelemetry/sdk-node": "0.223.0",
-    "@opentelemetry/auto-instrumentations-node": "0.81.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.223.0",
-    "@opentelemetry/resources": "2.12.0",
-    "@opentelemetry/semantic-conventions": "1.43.0",
+    "@opentelemetry/api": "1.10.0",
+    "@opentelemetry/auto-instrumentations-node": "0.83.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.301.2",
+    "@opentelemetry/resources": "3.1.1",
+    "@opentelemetry/sdk-node": "0.301.2",
+    "@opentelemetry/semantic-conventions": "1.45.0",
+    "fastify": "5.12.5",
     "pino": "9.5.0",
-    "prom-client": "15.1.3",
-    "@aws-sdk/client-s3": "3.1149.0"
+    "prom-client": "15.1.3"
   },
   "devDependencies": {
-    "typescript": "5.7.2",
-    "tsx": "4.19.2",
     "@types/node": "22.10.1",
-    "pino-pretty": "13.0.0"
+    "pino-pretty": "13.0.0",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2"
   }
 }
