@@ -32,4 +32,4 @@ resources:
 images:
 - name: ghcr.io/kelechi-nwankpa/platform-hello
   newName: ghcr.io/kelechi-nwankpa/platform-hello
-  newTag: sha-1418259
+  newTag: sha-09153fb
