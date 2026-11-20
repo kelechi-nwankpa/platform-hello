@@ -2,10 +2,12 @@
 # deployment.yaml — platform-hello
 #
 # 2 replicas (HA even at MVP). Distroless nonroot image built from the
-# skeleton's Dockerfile. Environment sourced from TWO Secrets via envFrom:
-#   - platform-hello-config      — app config from Vault via ESO
+# skeleton's Dockerfile. Environment: inline vars below, plus envFrom
 #   - platform-hello-bucket-conn — S3 credentials from ObjectBucket XRC's
 #                                    writeConnectionSecretToRef
+# No Vault/ExternalSecret config: this service reads no secret config
+# (the Vault path only ever held the template's DUMMY_CONFIG placeholder,
+# and depending on it took the service down when Vault was reset).
 #
 # Probes:
 #   /healthz — liveness. Kubelet restarts pod if fails.
@@ -68,11 +70,6 @@ spec:
           # Environment — sourced from Secrets + a few inline OTel vars
           # ─────────────────────────────────────────────────────────
           envFrom:
-            # App config synced from Vault via ExternalSecret (see
-            # externalsecret.yaml). Contents defined by whoever owns
-            # the Vault path secret/platform-team/platform-hello.
-            - secretRef:
-                name: platform-hello-config
             # S3 credentials + BUCKET_NAME from the ObjectBucket XRC
             # (see objectbucket.yaml). Keys populated by Crossplane:
             #   BUCKET_NAME, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,

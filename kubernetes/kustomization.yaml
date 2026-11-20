@@ -24,7 +24,6 @@ resources:
 - deployment.yaml
 - service.yaml
 - servicemonitor.yaml
-- externalsecret.yaml
 - certificate.yaml
 - ingress.yaml
 - objectbucket.yaml
