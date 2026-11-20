@@ -35,6 +35,17 @@ updates:
     commit-message:
       prefix: "chore"
       include: scope
+    ignore:
+      # @types/node must track the RUNTIME Node major (22, distroless
+      # nodejs22 base). Newer type majors describe APIs that don't
+      # exist at runtime. Bump together with the base image.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # TypeScript majors (7 = the native compiler rewrite) are a
+      # planned golden-path upgrade done in the template first, not
+      # a weekly bot bump.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types:
