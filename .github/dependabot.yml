@@ -1,0 +1,42 @@
+# Dependabot — keeps platform-hello's pins fresh.
+#
+# WHY docker matters most here: the runtime base is digest-pinned
+# (gcr.io/distroless/nodejs22-debian12:nonroot@sha256:...) for
+# reproducible builds. A pin never moves on its own, so patched base
+# rebuilds (e.g. OpenSSL fixes) only arrive through a digest-bump PR.
+# Pinning without this file trades supply-chain risk for staleness.
+#
+# No github-actions entry: the only `uses:` is our own reusable
+# workflow at @main (same owner, no trust boundary); Dependabot does
+# not bump branch refs anyway.
+
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore"
+      include: scope
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore"
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
