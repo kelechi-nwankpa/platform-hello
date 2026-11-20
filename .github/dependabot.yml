@@ -17,6 +17,12 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    # The builder (node:22-slim) and runtime (distroless nodejs22) must
+    # share a Node major — code compiled on 26 and run on 22 breaks.
+    # Node majors are a planned base-image upgrade of both stages.
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
     labels:
       - dependencies
       - docker
