@@ -1,52 +1,39 @@
-# .trivyignore — CVEs the pipeline tolerates because no upstream fix
-# is available yet. Each entry carries a reason and a review date so
-# this file does not become a dumping ground for silenced findings.
+# .trivyignore — CVEs the pipeline tolerates, each with evidence and a
+# review date so this file does not become a dumping ground for
+# silenced findings.
 #
 # Policy (per ADR-0032):
-#   - Only CVEs with no patched version upstream may be added here.
+#   - Only CVEs with no reachable fix, or proven unreachable, go here.
 #   - Every entry MUST have a comment with the reason + a review date.
 #   - On every CI run, Trivy still prints these to the log — the ignore
 #     only suppresses the exit-code block, not the visibility.
-#   - Review this file monthly and remove entries whose upstream fixes
-#     have landed. If an entry is older than 90 days with no upstream
-#     progress, open a GitHub issue to track the gap.
+#   - Re-verify by scanning the image WITHOUT this file and diffing.
 #
-# Last reviewed: 2026-10-10
+# Last reviewed: 2026-11-20 — full re-scan without this file. The 3
+# fastify entries (84428/84469/84504) were removed: no longer present.
 
-# ─── Fastify ────────────────────────────────────────────────────────
-# No upstream patch as of 2026-10-10. The fastify maintainers have
-# acknowledged these in their security advisories but no release has
-# shipped the fix. Monitor:
-#   https://github.com/fastify/fastify/security/advisories
-# Re-review: 2026-11-10
-CVE-2026-84428
-CVE-2026-84469
-CVE-2026-84504
-
-# ─── OpenSSL in distroless base ─────────────────────────────────────
-# All 4 openssl CVEs below are accepted as upstream-controlled risk.
-# Dockerfile is pinned to the current latest gcr.io/distroless/
-# nodejs22-debian12:nonroot digest, but Google's :nonroot rebuilds
-# lag Debian's security releases by days — so even "fixable" CVEs
-# (31789, 45447) sit here until Google ships a new base with the
-# patched libssl3.
+# ─── OpenSSL libssl3 in the distroless base — present, never loaded ──
+# All 7 findings are in Debian's libssl3 3.0.18-1~deb12u2 inside
+# gcr.io/distroless/nodejs22-debian12:nonroot. Debian has fixes
+# (3.0.19–3.0.22), but the digest we pin is still Google's latest
+# :nonroot build (checked 2026-11-20), so no patched base exists yet.
 #
-# Phase 8 security-hardening TODO:
-#   Migrate to cgr.dev/chainguard/node — Chainguard rebuilds hourly
-#   with the latest upstream security patches and typically ships
-#   zero HIGH/CRITICAL CVEs. Would eliminate this entire ignore
-#   block.
+# Why this is tolerable — the library is unreachable, verified:
+#   - Node does NOT use the system OpenSSL. `ldd /nodejs/bin/node`
+#     lists only libc, libstdc++, libm, libgcc_s, libdl, libpthread —
+#     no libssl/libcrypto. Node statically bundles its own OpenSSL
+#     (process.versions.openssl = 3.5.4).
+#   - Distroless has no shell, package manager or other binaries that
+#     could load libssl3. Node is the only process in the container.
 #
-# Note on CVE ID drift: Trivy's vuln DB updates several times per
-# hour and periodically reorganises Debian CVE IDs. We've seen the
-# same two unfixable openssl advisories surface as 28389/28390,
-# then 28387/28388, then back to 28389/28390 within a single day.
-# When re-reviewing this file, re-fetch the current scan output
-# rather than trusting these IDs.
-# Re-review: 2026-10-17 (7-day cycle until Chainguard migration)
+# Exit path: .github/dependabot.yml watches the base-image digest and
+# opens a PR when Google ships a rebuilt :nonroot image; that PR's CI
+# run shows which of these entries can go.
+# Re-review: 2026-12-04
 CVE-2026-28387
 CVE-2026-28388
 CVE-2026-28389
 CVE-2026-28390
 CVE-2026-31789
 CVE-2026-45447
+CVE-2026-84782
