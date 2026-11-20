@@ -14,27 +14,14 @@
 # uses upbound provider-aws-s3 to create a real S3 bucket. Same XRC,
 # different backend — the XRD abstraction holds across environments.
 #
-# ─── IMPORTANT: Wave 2 scope was MINIMAL (Path M) ──────────────────
-# This XRC creates a Crossplane-managed bucket named
-# `platform-hello-<6char-suffix>`. But platform-hello's Deployment
-# currently reads/writes against the ORIGINAL manually-created bucket
-# named `platform-hello` via the manually-maintained Secret
-# `platform-hello-bucket-conn` (also in this namespace, NOT in Git).
-#
-# So after Wave 2:
-#   - This XRC proves the GitOps path works end-to-end on kind. ✓
-#   - The deployment still uses the manual bucket + manual Secret. ✗
-#
-# The CONVERGENCE (making the deployment actually read from this
-# Crossplane-managed bucket, with per-service IAM via vshn User +
-# Policy MRs rather than shared MinIO root creds) is explicitly
-# deferred to a Phase 4 Wave 3. See phase-4 close-out log for the
-# roadmap.
-#
-# writeConnectionSecretToRef is left in place for forward-compat:
-# when Wave 3 adds User+Policy MRs to the Composition, that Secret
-# will populate with real per-service creds, and the deployment can
-# switch over.
+# ─── Credentials (converged in Phase 8 Wave 4, 8W4.2) ──────────────
+# The Composition creates this bucket PLUS a per-claim MinIO User whose
+# only Policy is "all operations on this bucket", and writes BUCKET_NAME,
+# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL and
+# AWS_REGION into `platform-hello-bucket-conn`, which the Deployment
+# mounts via envFrom. Nothing is hand-made and nothing uses MinIO's root
+# account. (Until 8W4.2 the Deployment used a manual bucket + manual
+# Secret outside Git; both were lost in the MinIO reset.)
 # ────────────────────────────────────────────────────────────────────
 
 apiVersion: platform.idp.io/v1alpha1
@@ -52,8 +39,4 @@ spec:
     versioning: true        # SILENTLY IGNORED on kind (same reason)
                             # Both take effect on EKS where the s3 variant runs
   writeConnectionSecretToRef:
-    name: platform-hello-bucket-conn-xrd
-    # NOTE: deliberately NOT `platform-hello-bucket-conn` — that name is
-    # claimed by the Wave 2-era manual Secret (not in Git). Rename back
-    # to `platform-hello-bucket-conn` when Wave 3 lands and deletes
-    # the manual Secret.
+    name: platform-hello-bucket-conn
