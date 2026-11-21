@@ -1,28 +1,17 @@
 ---
 # objectbucket.yaml — platform-hello
 #
-# Crossplane XRC (Composite Resource Claim) that materialises an S3-
-# compatible bucket via the platform's Phase 4 ObjectBucket XRD
-# (see ADR-0027). Previously removed from Git in Phase 6 (bug 5)
-# because Phase 4 Wave 1 shipped the XRD without a ProviderConfig —
-# the XRC applied but couldn't reconcile.
+# A request for one bucket (platform ADR-0027). The platform decides how
+# to fulfil it:
+#   on kind: a MinIO bucket plus a user and key limited to that bucket.
+#   on EKS:  an S3 bucket (private, encrypted, versioned) plus an IAM
+#            role limited to that bucket, which only this service's
+#            ServiceAccount can assume (platform ADR-0034).
+# Same YAML on both.
 #
-# Phase 4 Wave 2 fixed that. On kind, the XRD's defaultCompositionRef
-# now points at the MinIO-variant Composition (xobjectbuckets-minio),
-# which uses vshn/provider-minio to create a real bucket in MinIO.
-# On EKS (Phase 9+), the default flips to xobjectbuckets-s3, which
-# uses upbound provider-aws-s3 to create a real S3 bucket. Same XRC,
-# different backend — the XRD abstraction holds across environments.
-#
-# ─── Credentials (converged in Phase 8 Wave 4, 8W4.2) ──────────────
-# The Composition creates this bucket PLUS a per-claim MinIO User whose
-# only Policy is "all operations on this bucket", and writes BUCKET_NAME,
-# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL and
-# AWS_REGION into `platform-hello-bucket-conn`, which the Deployment
-# mounts via envFrom. Nothing is hand-made and nothing uses MinIO's root
-# account. (Until 8W4.2 the Deployment used a manual bucket + manual
-# Secret outside Git; both were lost in the MinIO reset.)
-# ────────────────────────────────────────────────────────────────────
+# `writeConnectionSecretToRef` names the Secret the platform fills in;
+# deployment.yaml loads it with envFrom. Keys: BUCKET_NAME and AWS_REGION
+# always; an access key and endpoint on kind; AWS_ROLE_ARN on EKS.
 
 apiVersion: platform.idp.io/v1alpha1
 kind: ObjectBucket
