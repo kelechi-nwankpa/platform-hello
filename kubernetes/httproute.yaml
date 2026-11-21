@@ -1,0 +1,31 @@
+---
+# Publishes this service at https://platform-hello.idp.seniormankelz.dev
+# through the platform's shared Gateway (platform ADR-0033).
+#
+# This file is all a service owns at the edge. TLS, the certificate, the
+# HTTP->HTTPS redirect and DNS belong to the platform Gateway.
+#
+# It only takes effect if the platform has labelled this namespace
+#   edge.idp.seniormankelz.dev/allow-routes: "true"
+# Without the label the Gateway refuses the route (NotAllowedByListeners).
+#
+# sectionName: https — attach to the TLS listener only. The plain-HTTP
+# listener accepts nothing but the platform's redirect.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: platform-hello
+  labels:
+    app: platform-hello
+    app.kubernetes.io/component: api
+spec:
+  parentRefs:
+    - name: edge
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - platform-hello.idp.seniormankelz.dev
+  rules:
+    - backendRefs:
+        - name: platform-hello
+          port: 3000
